@@ -21,6 +21,8 @@ from glob import glob
 from matplotlib import rc
 from matplotlib import dates as mpdates
 from matplotlib import pyplot as plt
+from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
+                               AutoMinorLocator)
 
 # ---------------- #
 # Data directories #
@@ -30,15 +32,16 @@ home = os.path.expanduser("~")
 # main data directory
 BUL = os.path.join(home, "Documents", "Data", "BUL")
 
-# --------------- #
-# Load vDial Data #
-# --------------- #
+# -------------------------- #
+# Load Water Vapor Dial Data #
+# -------------------------- #
 # AERIonly
-f_AERI = glob(os.path.join(BUL, "vDial", "AERIonly", "*.2017052*.cdf"))
+f_AERI = glob(os.path.join(BUL, "WaterVaporDial", "AERIonly", "*.2017052*.cdf"))
 f_AERI = f_AERI[:4]
 AERI_dic = {}
 d = 20
 # loop through these files and load all vars and ncattrs into dictionary
+print("---AERI Only---")
 for f in f_AERI:
     AERI_dic[d] = {}
     print(f"Reading file: {f.split(os.sep)[-1]}")
@@ -51,7 +54,8 @@ for f in f_AERI:
     d += 1
 
 #AERIrLID
-f_AERIrLID = glob(os.path.join(BUL, "vDial", "AERIrLID", "*.2017052*.cdf"))
+print("---AERI with Raman Lidar---")
+f_AERIrLID = glob(os.path.join(BUL, "WaterVaporDial", "AERIrLID", "*.2017052*.cdf"))
 f_AERIrLID = f_AERIrLID[:4]
 AERIrLID_dic = {}
 d = 20
@@ -68,7 +72,8 @@ for f in f_AERIrLID:
     d += 1
 
 #AERIvDIAL
-f_AERIvDIAL = glob(os.path.join(BUL, "vDial", "AERIvDIAL", "*.2017052*.cdf"))
+print("---AERI with Water Vapor Dial---")
+f_AERIvDIAL = glob(os.path.join(BUL, "WaterVaporDial", "AERIvDIAL", "*.2017052*.cdf"))
 f_AERIvDIAL = f_AERIvDIAL[:4]
 AERIvDIAL_dic = {}
 d = 20
@@ -87,3 +92,65 @@ for f in f_AERIvDIAL:
 # ------------------------------- #
 # Plot Time-Height Cross Sections #
 # ------------------------------- #
+rc('font',weight='normal',size=20,family='serif',serif='Computer Modern Roman')
+rc('text',usetex='True')
+# AERI only
+# create meshgrid
+iz = np.where(AERI_dic[20]["height"] <= 4.)[0]
+X1, Y1 = np.meshgrid(AERI_dic[20]["hour"], AERI_dic[20]["height"][iz])
+
+fig1, ax1 = plt.subplots(nrows=3, ncols=1, sharex=True, figsize=(16,12))
+
+cfax1 = ax1[0].pcolormesh(X1, Y1, AERI_dic[20]["temperature"][:, iz].transpose(), 
+    cmap=cmocean.cm.thermal, vmin=0., vmax=30.)
+cbar1 = plt.colorbar(cfax1, ax=ax1[0])
+cbar1.ax.set_ylabel("Temperature [$^\circ$C]")
+# ax1[0].set_xlabel("Hour [UTC]")
+ax1[0].set_ylabel("Altitude [km AGL]")
+# ax1[0].set_xlim([0, 24])
+ax1[0].set_ylim([0, 4])
+ax1[0].yaxis.set_major_locator(MultipleLocator(1))
+ax1[0].yaxis.set_minor_locator(MultipleLocator(0.25))
+
+# AERI + Raman
+iz = np.where(AERIrLID_dic[20]["height"] <= 4.)[0]
+X2, Y2 = np.meshgrid(AERIrLID_dic[20]["hour"], AERIrLID_dic[20]["height"][iz])
+
+cfax2 = ax1[1].pcolormesh(X2, Y2, AERIrLID_dic[20]["temperature"][:, iz].transpose(), 
+    cmap=cmocean.cm.thermal, vmin=0., vmax=30.)
+cbar2 = plt.colorbar(cfax2, ax=ax1[1])
+cbar2.ax.set_ylabel("Temperature [$^\circ$C]")
+# ax1.set_xlabel("Hour [UTC]")
+ax1[1].set_ylabel("Altitude [km AGL]")
+# ax1.set_xlim([0, 24])
+ax1[1].set_ylim([0, 4])
+ax1[1].yaxis.set_major_locator(MultipleLocator(1))
+ax1[1].yaxis.set_minor_locator(MultipleLocator(0.25))
+
+# AERI + vDial
+iz = np.where(AERIvDIAL_dic[20]["height"] <= 4.)[0]
+X3, Y3 = np.meshgrid(AERIvDIAL_dic[20]["hour"], AERIvDIAL_dic[20]["height"][iz])
+
+cfax3 = ax1[2].pcolormesh(X3, Y3, AERIvDIAL_dic[20]["temperature"][:, iz].transpose(), 
+    cmap=cmocean.cm.thermal, vmin=0., vmax=30.)
+cbar3 = plt.colorbar(cfax3, ax=ax1[2])
+cbar3.ax.set_ylabel("Temperature [$^\circ$C]")
+ax1[2].set_xlabel("Hour [UTC]")
+ax1[2].set_ylabel("Altitude [km AGL]")
+ax1[2].set_xlim([0, 24])
+ax1[2].set_ylim([0, 4])
+ax1[2].xaxis.set_major_locator(MultipleLocator(3))
+ax1[2].xaxis.set_minor_locator(MultipleLocator(1))
+ax1[2].yaxis.set_major_locator(MultipleLocator(1))
+ax1[2].yaxis.set_minor_locator(MultipleLocator(0.25))
+
+fig1.tight_layout()
+
+plt.show()
+
+
+
+
+
+
+
