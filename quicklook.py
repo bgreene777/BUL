@@ -114,6 +114,7 @@ for d in range(20, 24):
     ax1[0].set_ylim([0, 4])
     ax1[0].yaxis.set_major_locator(MultipleLocator(1))
     ax1[0].yaxis.set_minor_locator(MultipleLocator(0.25))
+    ax1[0].set_title(f"2017-05-{d} AERI Only")
 
     # AERI + Raman
     iz = np.where(AERIrLID_dic[d]["height"] <= 4.)[0]
@@ -130,6 +131,7 @@ for d in range(20, 24):
     ax1[1].set_ylim([0, 4])
     ax1[1].yaxis.set_major_locator(MultipleLocator(1))
     ax1[1].yaxis.set_minor_locator(MultipleLocator(0.25))
+    ax1[1].set_title("AERI + Raman")
 
     # AERI + vDial
     iz = np.where(AERIvDIAL_dic[d]["height"] <= 4.)[0]
@@ -148,9 +150,30 @@ for d in range(20, 24):
     ax1[2].xaxis.set_minor_locator(MultipleLocator(1))
     ax1[2].yaxis.set_major_locator(MultipleLocator(1))
     ax1[2].yaxis.set_minor_locator(MultipleLocator(0.25))
+    ax1[2].set_title("AERI + vDIAL")
 
     fig1.tight_layout()
 
     fig1.savefig(os.path.join(figpath, f"201705{d}_Temperature.pdf"), dpi=150, fmt="pdf")
     plt.close(fig1)
 
+# ---------------------------------------------------------- #
+# Plot differences of each time-height relative to AERI Only #
+# ---------------------------------------------------------- #
+# grab data
+z = AERI_dic[20]["height"]
+hrs = AERI_dic[20]["hour"]
+iz = np.where(z <= 4.)[0]
+it = np.where(AERIrLID_dic[20]["hour"] in hrs)[0]
+AERI_T = AERI_dic[20]["temperature"][:, iz].transpose()
+AERIrLID_T = AERIrLID_dic[20]["temperature"][:, iz][it].transpose()
+AERIvDIAL_T = AERIvDIAL_dic[20]["temperature"][:, iz][it].transpose()
+# calculate differences
+AERI_LID_T_diff = AERI_T - AERIrLID_T
+AERI_DIAL_T_diff = AERI_T - AERIvDIAL_T
+# plot
+fig2, ax2 = plt.subplots(nrows=2, ncols=1, sharex=True, figsize=(16, 8))
+# AERI - AERIrLID
+cfax21 = ax2[0].pcolormesh(hrs, z, AERI_LID_T_diff)
+
+cfax22 = ax2[1].pcolormesh(hrs, z, AERI_DIAL_T_diff)
