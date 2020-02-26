@@ -31,13 +31,16 @@ from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
 home = os.path.expanduser("~")
 # main data directory
 BUL = os.path.join(home, "Documents", "Data", "BUL")
+# figure save directory
+figpath = os.path.join(BUL, "Figures", "Quicklook")
+if not os.path.exists(figpath):
+    os.mkdir(figpath)
 
 # -------------------------- #
 # Load Water Vapor Dial Data #
 # -------------------------- #
 # AERIonly
-f_AERI = glob(os.path.join(BUL, "WaterVaporDial", "AERIonly", "*.2017052*.cdf"))
-f_AERI = f_AERI[:4]
+f_AERI = glob(os.path.join(BUL, "WaterVaporDial", "AERIonly", "*.2017052[0-3]*.cdf"))
 AERI_dic = {}
 d = 20
 # loop through these files and load all vars and ncattrs into dictionary
@@ -55,8 +58,7 @@ for f in f_AERI:
 
 #AERIrLID
 print("---AERI with Raman Lidar---")
-f_AERIrLID = glob(os.path.join(BUL, "WaterVaporDial", "AERIrLID", "*.2017052*.cdf"))
-f_AERIrLID = f_AERIrLID[:4]
+f_AERIrLID = glob(os.path.join(BUL, "WaterVaporDial", "AERIrLID", "*.2017052[0-3]*.cdf"))
 AERIrLID_dic = {}
 d = 20
 # loop through these files and load all vars and ncattrs into dictionary
@@ -73,8 +75,7 @@ for f in f_AERIrLID:
 
 #AERIvDIAL
 print("---AERI with Water Vapor Dial---")
-f_AERIvDIAL = glob(os.path.join(BUL, "WaterVaporDial", "AERIvDIAL", "*.2017052*.cdf"))
-f_AERIvDIAL = f_AERIvDIAL[:4]
+f_AERIvDIAL = glob(os.path.join(BUL, "WaterVaporDial", "AERIvDIAL", "*.2017052[0-3]*.cdf"))
 AERIvDIAL_dic = {}
 d = 20
 # loop through these files and load all vars and ncattrs into dictionary
@@ -104,6 +105,7 @@ for d in range(20, 24):
 
     cfax1 = ax1[0].pcolormesh(X1, Y1, AERI_dic[d]["temperature"][:, iz].transpose(), 
         cmap=cmocean.cm.thermal, vmin=0., vmax=30.)
+    cfax1.set_edgecolor("face")
     cbar1 = plt.colorbar(cfax1, ax=ax1[0])
     cbar1.ax.set_ylabel("Temperature [$^\circ$C]")
     # ax1[0].set_xlabel("Hour [UTC]")
@@ -119,6 +121,7 @@ for d in range(20, 24):
 
     cfax2 = ax1[1].pcolormesh(X2, Y2, AERIrLID_dic[d]["temperature"][:, iz].transpose(), 
         cmap=cmocean.cm.thermal, vmin=0., vmax=30.)
+    cfax2.set_edgecolor("face")
     cbar2 = plt.colorbar(cfax2, ax=ax1[1])
     cbar2.ax.set_ylabel("Temperature [$^\circ$C]")
     # ax1.set_xlabel("Hour [UTC]")
@@ -134,6 +137,7 @@ for d in range(20, 24):
 
     cfax3 = ax1[2].pcolormesh(X3, Y3, AERIvDIAL_dic[d]["temperature"][:, iz].transpose(), 
         cmap=cmocean.cm.thermal, vmin=0., vmax=30.)
+    cfax3.set_edgecolor("face")
     cbar3 = plt.colorbar(cfax3, ax=ax1[2])
     cbar3.ax.set_ylabel("Temperature [$^\circ$C]")
     ax1[2].set_xlabel("Hour [UTC]")
@@ -147,11 +151,6 @@ for d in range(20, 24):
 
     fig1.tight_layout()
 
-    plt.show()
-
-
-
-
-
-
+    fig1.savefig(os.path.join(figpath, f"201705{d}_Temperature.pdf"), dpi=150, fmt="pdf")
+    plt.close(fig1)
 
