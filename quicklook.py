@@ -161,49 +161,73 @@ for d in range(20, 24):
 # ---------------------------------------------------------- #
 # Plot differences of each time-height relative to AERI Only #
 # ---------------------------------------------------------- #
-# grab data
-# heights below 4 km (all files symmetric)
-z = AERI_dic[20]["height"]
-iz = np.where(z <= 4.)[0]
-# missing temporal data in some files
-# find longest temporal array
-hrs1 = AERI_dic[20]["hour"]
-hrs2 = AERIrLID_dic[20]["hour"]
-hrs3 = AERIvDIAL_dic[20]["hour"]
-hrs_all = [hrs1, hrs2, hrs3]
-ilong = np.argmax([len(i) for i in hrs_all])
-# grab T data
-AERI_T = AERI_dic[20]["temperature"][:, iz]
-AERIrLID_T = AERIrLID_dic[20]["temperature"][:, iz]
-AERIvDIAL_T = AERIvDIAL_dic[20]["temperature"][:, iz]
-# store in a dictionary for looping access
-T_dic = {0: AERI_T,
-         1: AERIrLID_T,
-         2: AERIvDIAL_T}
-# interpolate in time at each level
-hrs_interp = hrs_all[ilong]
-T_dic_interp = {}
-for i in range(3):
-    if i == ilong:
-        T_dic_interp[i] = T_dic[i]
-    else:
-        T_new = np.full((len(hrs_interp), len(iz)), np.nan)
-        for j in range(len(iz)):
-            f = interp1d(hrs_all[i], T_dic[i][:, j], fill_value='extrapolate')
-            fnew = f(hrs_interp.data)
-            T_new[:, j] = fnew
-        T_dic_interp[i] = T_new
+for d in range(20, 24):
+    # grab data
+    # heights below 4 km (all files symmetric)
+    z = AERI_dic[d]["height"]
+    iz = np.where(z <= 4.)[0]
+    # missing temporal data in some files
+    # find longest temporal array
+    hrs1 = AERI_dic[d]["hour"]
+    hrs2 = AERIrLID_dic[d]["hour"]
+    hrs3 = AERIvDIAL_dic[d]["hour"]
+    hrs_all = [hrs1, hrs2, hrs3]
+    ilong = np.argmax([len(i) for i in hrs_all])
+    # grab T data
+    AERI_T = AERI_dic[d]["temperature"][:, iz]
+    AERIrLID_T = AERIrLID_dic[d]["temperature"][:, iz]
+    AERIvDIAL_T = AERIvDIAL_dic[d]["temperature"][:, iz]
+    # store in a dictionary for looping access
+    T_dic = {0: AERI_T,
+             1: AERIrLID_T,
+             2: AERIvDIAL_T}
+    # interpolate in time at each level
+    hrs_interp = hrs_all[ilong]
+    T_dic_interp = {}
+    for i in range(3):
+        if i == ilong:
+            T_dic_interp[i] = T_dic[i]
+        else:
+            T_new = np.full((len(hrs_interp), len(iz)), np.nan)
+            for j in range(len(iz)):
+                f = interp1d(hrs_all[i], T_dic[i][:, j], fill_value='extrapolate')
+                fnew = f(hrs_interp.data)
+                T_new[:, j] = fnew
+            T_dic_interp[i] = T_new
 
-# calculate differences
-AERI_LID_T_diff = (T_dic_interp[0] - T_dic_interp[1]).transpose()
-AERI_DIAL_T_diff = (T_dic_interp[0] - T_dic_interp[2]).transpose()
-# plot
-fig2, ax2 = plt.subplots(nrows=2, ncols=1, sharex=True, figsize=(16, 8))
-# AERI - AERIrLID
-cfax21 = ax2[0].pcolormesh(hrs_interp, z[iz], AERI_LID_T_diff, 
-    cmap=cmocean.cm.balance,vmin=-15,vmax=15)
-cbar21 = plt.colorbar(cfax21, ax=ax2[0])
+    # calculate differences
+    AERI_LID_T_diff = (T_dic_interp[0] - T_dic_interp[1]).transpose()
+    AERI_DIAL_T_diff = (T_dic_interp[0] - T_dic_interp[2]).transpose()
+    # plot
+    fig2, ax2 = plt.subplots(nrows=2, ncols=1, sharex=True, figsize=(16, 8))
+    # AERI - AERIrLID
+    cfax21 = ax2[0].pcolormesh(hrs_interp, z[iz], AERI_LID_T_diff, 
+        cmap=cmocean.cm.balance,vmin=-15,vmax=15)
+    cbar21 = plt.colorbar(cfax21, ax=ax2[0])
+    cbar21.ax.set_ylabel("$\Delta T$ [$^\circ$C]")
+    ax2[0].set_ylabel("Altitude [km AGL]")
+    ax2[0].set_ylim([0, 4])
+    ax2[0].yaxis.set_major_locator(MultipleLocator(1))
+    ax2[0].yaxis.set_minor_locator(MultipleLocator(0.25))
+    ax2[0].set_title(f"2017-05-{d} AERI - Raman")
+    cfax21.set_edgecolor("face")
 
-cfax22 = ax2[1].pcolormesh(hrs_interp, z[iz], AERI_DIAL_T_diff,
-    cmap=cmocean.cm.balance,vmin=-15,vmax=15)
-cbar22 = plt.colorbar(cfax22, ax=ax2[1])
+    # AERI - AERIvDIAL
+    cfax22 = ax2[1].pcolormesh(hrs_interp, z[iz], AERI_DIAL_T_diff,
+        cmap=cmocean.cm.balance,vmin=-15,vmax=15)
+    cbar22 = plt.colorbar(cfax22, ax=ax2[1])
+    cbar22.ax.set_ylabel("$\Delta T$ [$^\circ$C]")
+    ax2[1].set_xlabel("Hour [UTC]")
+    ax2[1].set_ylabel("Altitude [km AGL]")
+    ax2[1].set_xlim([0, 24])
+    ax2[1].set_ylim([0, 4])
+    ax2[1].xaxis.set_major_locator(MultipleLocator(3))
+    ax2[1].xaxis.set_minor_locator(MultipleLocator(1))
+    ax2[1].yaxis.set_major_locator(MultipleLocator(1))
+    ax2[1].yaxis.set_minor_locator(MultipleLocator(0.25))
+    ax2[1].set_title("AERI - vDIAL")
+    cfax22.set_edgecolor("face")
+
+    fig2.tight_layout()
+    fig2.savefig(os.path.join(figpath, f"201705{d}_Temperature_diff.pdf"), dpi=150, fmt="pdf")
+    plt.close(fig2)
