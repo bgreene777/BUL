@@ -18,6 +18,7 @@ import numpy as np
 import cmocean
 
 from glob import glob
+from scipy.interpolate import interp1d
 from matplotlib import rc
 from matplotlib import dates as mpdates
 from matplotlib import pyplot as plt
@@ -161,19 +162,48 @@ for d in range(20, 24):
 # Plot differences of each time-height relative to AERI Only #
 # ---------------------------------------------------------- #
 # grab data
+# heights below 4 km (all files symmetric)
 z = AERI_dic[20]["height"]
-hrs = AERI_dic[20]["hour"]
 iz = np.where(z <= 4.)[0]
-it = np.where(AERIrLID_dic[20]["hour"] in hrs)[0]
-AERI_T = AERI_dic[20]["temperature"][:, iz].transpose()
-AERIrLID_T = AERIrLID_dic[20]["temperature"][:, iz][it].transpose()
-AERIvDIAL_T = AERIvDIAL_dic[20]["temperature"][:, iz][it].transpose()
+# missing temporal data in some files
+# find longest temporal array
+hrs1 = AERI_dic[20]["hour"]
+hrs2 = AERIrLID_dic[20]["hour"]
+hrs3 = AERIvDIAL_dic[20]["hour"]
+hrs_all = [hrs1, hrs2, hrs3]
+ilong = np.argmax([len(i) for i in hrs_all])
+# grab T data
+AERI_T = AERI_dic[20]["temperature"][:, iz]
+AERIrLID_T = AERIrLID_dic[20]["temperature"][:, iz]
+AERIvDIAL_T = AERIvDIAL_dic[20]["temperature"][:, iz]
+# store in a dictionary for looping access
+T_dic = {0: AERI_T,
+         1: AERIrLID_T,
+         2: AERIvDIAL_T}
+# interpolate in time at each level
+hrs_interp = hrs_all[ilong]
+T_dic_interp = {}
+for i in range(3):
+    if i == ilong:
+        T_dic_interp[i] = T_dic[i]
+    else:
+        T_new = np.full((len(hrs_interp), len(iz)), np.nan)
+        for j in range(len(iz)):
+            f = interp1d(hrs_all[i], T_dic[i][:, j], fill_value='extrapolate')
+            fnew = f(hrs_interp.data)
+            T_new[:, j] = fnew
+        T_dic_interp[i] = T_new
+
 # calculate differences
-AERI_LID_T_diff = AERI_T - AERIrLID_T
-AERI_DIAL_T_diff = AERI_T - AERIvDIAL_T
+AERI_LID_T_diff = (T_dic_interp[0] - T_dic_interp[1]).transpose()
+AERI_DIAL_T_diff = (T_dic_interp[0] - T_dic_interp[2]).transpose()
 # plot
 fig2, ax2 = plt.subplots(nrows=2, ncols=1, sharex=True, figsize=(16, 8))
 # AERI - AERIrLID
-cfax21 = ax2[0].pcolormesh(hrs, z, AERI_LID_T_diff)
+cfax21 = ax2[0].pcolormesh(hrs_interp, z[iz], AERI_LID_T_diff, 
+    cmap=cmocean.cm.balance,vmin=-15,vmax=15)
+cbar21 = plt.colorbar(cfax21, ax=ax2[0])
 
-cfax22 = ax2[1].pcolormesh(hrs, z, AERI_DIAL_T_diff)
+cfax22 = ax2[1].pcolormesh(hrs_interp, z[iz], AERI_DIAL_T_diff,
+    cmap=cmocean.cm.balance,vmin=-15,vmax=15)
+cbar22 = plt.colorbar(cfax22, ax=ax2[1])
