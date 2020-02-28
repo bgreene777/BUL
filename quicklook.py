@@ -42,11 +42,14 @@ if not os.path.exists(figpath):
 # -------------------------- #
 # AERIonly
 f_AERI = glob(os.path.join(BUL, "WaterVaporDial", "AERIonly", "*.2017052[0-3]*.cdf"))
+# sort files
+date_AERI = [int(ff.split(os.sep)[-1].split(".")[-3]) for ff in f_AERI]
+id_AERI = np.argsort(date_AERI)
 AERI_dic = {}
 d = 20
 # loop through these files and load all vars and ncattrs into dictionary
 print("---AERI Only---")
-for f in f_AERI:
+for f in np.asarray(f_AERI)[id_AERI]:
     AERI_dic[d] = {}
     print(f"Reading file: {f.split(os.sep)[-1]}")
     df = netCDF4.Dataset(f, "r")
@@ -60,10 +63,12 @@ for f in f_AERI:
 #AERIrLID
 print("---AERI with Raman Lidar---")
 f_AERIrLID = glob(os.path.join(BUL, "WaterVaporDial", "AERIrLID", "*.2017052[0-3]*.cdf"))
+date_AERIrLID = [int(ff.split(os.sep)[-1].split(".")[-3]) for ff in f_AERIrLID]
+id_AERIrLID = np.argsort(date_AERIrLID)
 AERIrLID_dic = {}
 d = 20
 # loop through these files and load all vars and ncattrs into dictionary
-for f in f_AERIrLID:
+for f in np.asarray(f_AERIrLID)[id_AERIrLID]:
     AERIrLID_dic[d] = {}
     print(f"Reading file: {f.split(os.sep)[-1]}")
     df = netCDF4.Dataset(f, "r")
@@ -77,10 +82,12 @@ for f in f_AERIrLID:
 #AERIvDIAL
 print("---AERI with Water Vapor Dial---")
 f_AERIvDIAL = glob(os.path.join(BUL, "WaterVaporDial", "AERIvDIAL", "*.2017052[0-3]*.cdf"))
+date_AERIvDIAL = [int(ff.split(os.sep)[-1].split(".")[-3]) for ff in f_AERIvDIAL]
+id_AERIvDIAL = np.argsort(date_AERIvDIAL)
 AERIvDIAL_dic = {}
 d = 20
 # loop through these files and load all vars and ncattrs into dictionary
-for f in f_AERIvDIAL:
+for f in np.asarray(f_AERIvDIAL)[id_AERIvDIAL]:
     AERIvDIAL_dic[d] = {}
     print(f"Reading file: {f.split(os.sep)[-1]}")
     df = netCDF4.Dataset(f, "r")
@@ -154,13 +161,15 @@ for d in range(20, 24):
     ax1[2].set_title("AERI + vDIAL")
 
     fig1.tight_layout()
-
-    fig1.savefig(os.path.join(figpath, f"201705{d}_Temperature.pdf"), dpi=150, fmt="pdf")
+    fsave1 = f"201705{d}_Temperature.pdf"
+    print(f"Saving figure: {fsave1}")
+    fig1.savefig(os.path.join(figpath, fsave1), dpi=150, fmt="pdf")
     plt.close(fig1)
 
 # ---------------------------------------------------------- #
 # Plot differences of each time-height relative to AERI Only #
 # ---------------------------------------------------------- #
+print("---Plotting---")
 for d in range(20, 24):
     # grab data
     # heights below 4 km (all files symmetric)
@@ -190,7 +199,7 @@ for d in range(20, 24):
         else:
             T_new = np.full((len(hrs_interp), len(iz)), np.nan)
             for j in range(len(iz)):
-                f = interp1d(hrs_all[i], T_dic[i][:, j], fill_value='extrapolate')
+                f = interp1d(hrs_all[i], T_dic[i][:, j], fill_value="extrapolate")
                 fnew = f(hrs_interp.data)
                 T_new[:, j] = fnew
             T_dic_interp[i] = T_new
@@ -202,7 +211,7 @@ for d in range(20, 24):
     fig2, ax2 = plt.subplots(nrows=2, ncols=1, sharex=True, figsize=(16, 8))
     # AERI - AERIrLID
     cfax21 = ax2[0].pcolormesh(hrs_interp, z[iz], AERI_LID_T_diff, 
-        cmap=cmocean.cm.balance,vmin=-15,vmax=15)
+        cmap=cmocean.cm.balance,vmin=-5,vmax=5)
     cbar21 = plt.colorbar(cfax21, ax=ax2[0])
     cbar21.ax.set_ylabel("$\Delta T$ [$^\circ$C]")
     ax2[0].set_ylabel("Altitude [km AGL]")
@@ -214,7 +223,7 @@ for d in range(20, 24):
 
     # AERI - AERIvDIAL
     cfax22 = ax2[1].pcolormesh(hrs_interp, z[iz], AERI_DIAL_T_diff,
-        cmap=cmocean.cm.balance,vmin=-15,vmax=15)
+        cmap=cmocean.cm.balance,vmin=-5,vmax=5)
     cbar22 = plt.colorbar(cfax22, ax=ax2[1])
     cbar22.ax.set_ylabel("$\Delta T$ [$^\circ$C]")
     ax2[1].set_xlabel("Hour [UTC]")
@@ -229,5 +238,7 @@ for d in range(20, 24):
     cfax22.set_edgecolor("face")
 
     fig2.tight_layout()
-    fig2.savefig(os.path.join(figpath, f"201705{d}_Temperature_diff.pdf"), dpi=150, fmt="pdf")
+    fsave2 = f"201705{d}_Temperature_diff.pdf"
+    print(f"Saving figure: {fsave2}")
+    fig2.savefig(os.path.join(figpath, fsave2), dpi=150, fmt="pdf")
     plt.close(fig2)
