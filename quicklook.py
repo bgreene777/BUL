@@ -188,8 +188,8 @@ for d in range(20, 24):
     AERIvDIAL_T = AERIvDIAL_dic[d]["temperature"][:, iz]
     # grab w data
     AERI_w = AERI_dic[d]["waterVapor"][:, iz]
-    AERIrLID_w = AERIrLID_dic[d]["temperature"][:, iz]
-    AERIvDIAL_w = AERIvDIAL_dic[d]["temperature"][:, iz]
+    AERIrLID_w = AERIrLID_dic[d]["waterVapor"][:, iz]
+    AERIvDIAL_w = AERIvDIAL_dic[d]["waterVapor"][:, iz]
     # store in a dictionary for looping access
     T_dic = {0: AERI_T,
              1: AERIrLID_T,
@@ -264,7 +264,7 @@ for d in range(20, 24):
     fig3, ax3 = plt.subplots(nrows=2, ncols=1, sharex=True, figsize=(16, 8))
     # AERI - AERIrLID
     cfax31 = ax3[0].pcolormesh(hrs_interp, z[iz], AERI_LID_w_diff, 
-        cmap=cmocean.cm.balance,vmin=-10,vmax=10)
+        cmap=cmocean.cm.balance,vmin=-5,vmax=5)
     cbar31 = plt.colorbar(cfax31, ax=ax3[0])
     cbar31.ax.set_ylabel("$\Delta w$ [g Kg$^{-1}$]")
     ax3[0].set_ylabel("Altitude [km AGL]")
@@ -276,7 +276,7 @@ for d in range(20, 24):
 
     # AERI - AERIvDIAL
     cfax32 = ax3[1].pcolormesh(hrs_interp, z[iz], AERI_DIAL_w_diff,
-        cmap=cmocean.cm.balance,vmin=-10,vmax=10)
+        cmap=cmocean.cm.balance,vmin=-5,vmax=5)
     cbar32 = plt.colorbar(cfax32, ax=ax3[1])
     cbar32.ax.set_ylabel("$\Delta w$ [g Kg$^{-1}$]")
     ax3[1].set_xlabel("Hour [UTC]")
