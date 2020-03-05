@@ -223,12 +223,17 @@ for d in range(20, 24):
     AERI_DIAL_T_diff = (T_dic_interp[0] - T_dic_interp[2]).transpose()
     AERI_LID_w_diff = (w_dic_interp[0] - w_dic_interp[1]).transpose()
     AERI_DIAL_w_diff = (w_dic_interp[0] - w_dic_interp[2]).transpose()
+    # grab AERIonly cloud base heights
+    i_cbh = np.where(AERI_dic[d]["cbh_flag"] == 2)[0]
+    cbh = AERI_dic[d]["cbh"][i_cbh]
+    t_cbh = AERI_dic[d]["hour"][i_cbh]
     # plot
     # Temperature
     fig2, ax2 = plt.subplots(nrows=2, ncols=1, sharex=True, figsize=(16, 8))
     # AERI - AERIrLID
     cfax21 = ax2[0].pcolormesh(hrs_interp, z[iz], AERI_LID_T_diff, 
         cmap=cmocean.cm.balance,vmin=-5,vmax=5)
+    ax2[0].plot(t_cbh, cbh, "ok", markersize=5)
     cbar21 = plt.colorbar(cfax21, ax=ax2[0])
     cbar21.ax.set_ylabel("$\Delta T$ [$^\circ$C]")
     ax2[0].set_ylabel("Altitude [km AGL]")
@@ -241,6 +246,7 @@ for d in range(20, 24):
     # AERI - AERIvDIAL
     cfax22 = ax2[1].pcolormesh(hrs_interp, z[iz], AERI_DIAL_T_diff,
         cmap=cmocean.cm.balance,vmin=-5,vmax=5)
+    ax2[1].plot(t_cbh, cbh, "ok", markersize=5)
     cbar22 = plt.colorbar(cfax22, ax=ax2[1])
     cbar22.ax.set_ylabel("$\Delta T$ [$^\circ$C]")
     ax2[1].set_xlabel("Hour [UTC]")
@@ -265,6 +271,7 @@ for d in range(20, 24):
     # AERI - AERIrLID
     cfax31 = ax3[0].pcolormesh(hrs_interp, z[iz], AERI_LID_w_diff, 
         cmap=cmocean.cm.balance,vmin=-5,vmax=5)
+    ax3[0].plot(t_cbh, cbh, "ok", markersize=5)
     cbar31 = plt.colorbar(cfax31, ax=ax3[0])
     cbar31.ax.set_ylabel("$\Delta w$ [g Kg$^{-1}$]")
     ax3[0].set_ylabel("Altitude [km AGL]")
@@ -277,6 +284,7 @@ for d in range(20, 24):
     # AERI - AERIvDIAL
     cfax32 = ax3[1].pcolormesh(hrs_interp, z[iz], AERI_DIAL_w_diff,
         cmap=cmocean.cm.balance,vmin=-5,vmax=5)
+    ax3[1].plot(t_cbh, cbh, "ok", markersize=5)
     cbar32 = plt.colorbar(cfax32, ax=ax3[1])
     cbar32.ax.set_ylabel("$\Delta w$ [g Kg$^{-1}$]")
     ax3[1].set_xlabel("Hour [UTC]")
