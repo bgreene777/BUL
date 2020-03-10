@@ -18,6 +18,7 @@ import numpy as np
 import cmocean
 
 from glob import glob
+from datetime import datetime
 from scipy.interpolate import interp1d
 from matplotlib import rc
 from matplotlib import dates as mpdates
@@ -36,6 +37,8 @@ BUL = os.path.join(home, "Documents", "Data", "BUL")
 figpath = os.path.join(BUL, "Figures", "Quicklook")
 if not os.path.exists(figpath):
     os.mkdir(figpath)
+# close all figures
+plt.close("all")
 
 # -------------------------- #
 # Load Water Vapor Dial Data #
@@ -46,10 +49,9 @@ f_AERI = glob(os.path.join(BUL, "WaterVaporDial", "AERIonly", "*.20170[516-609]*
 date_AERI = [int(ff.split(os.sep)[-1].split(".")[-3]) for ff in f_AERI]
 id_AERI = np.argsort(date_AERI)
 AERI_dic = {}
-d = 0
 # loop through these files and load all vars and ncattrs into dictionary
 print("---AERI Only---")
-for f in np.asarray(f_AERI)[id_AERI]:
+for d, f in enumerate(np.asarray(f_AERI)[id_AERI]):
     AERI_dic[d] = {}
     print(f"Reading file: {f.split(os.sep)[-1]}")
     df = netCDF4.Dataset(f, "r")
@@ -58,7 +60,6 @@ for f in np.asarray(f_AERI)[id_AERI]:
     for attr in df.ncattrs():
         AERI_dic[d][attr] = df.getncattr(attr)
     df.close()
-    d += 1
 
 #AERIrLID
 print("---AERI with Raman Lidar---")
@@ -66,9 +67,8 @@ f_AERIrLID = glob(os.path.join(BUL, "WaterVaporDial", "AERIrLID", "*.20170[516-6
 date_AERIrLID = [int(ff.split(os.sep)[-1].split(".")[-3]) for ff in f_AERIrLID]
 id_AERIrLID = np.argsort(date_AERIrLID)
 AERIrLID_dic = {}
-d = 0
 # loop through these files and load all vars and ncattrs into dictionary
-for f in np.asarray(f_AERIrLID)[id_AERIrLID]:
+for d, f in enumerate(np.asarray(f_AERIrLID)[id_AERIrLID]):
     AERIrLID_dic[d] = {}
     print(f"Reading file: {f.split(os.sep)[-1]}")
     df = netCDF4.Dataset(f, "r")
@@ -77,7 +77,6 @@ for f in np.asarray(f_AERIrLID)[id_AERIrLID]:
     for attr in df.ncattrs():
         AERIrLID_dic[d][attr] = df.getncattr(attr)
     df.close()
-    d += 1
 
 #AERIvDIAL
 print("---AERI with Water Vapor Dial---")
@@ -87,7 +86,7 @@ id_AERIvDIAL = np.argsort(date_AERIvDIAL)
 AERIvDIAL_dic = {}
 d = 0
 # loop through these files and load all vars and ncattrs into dictionary
-for f in np.asarray(f_AERIvDIAL)[id_AERIvDIAL]:
+for d, f in enumerate(np.asarray(f_AERIvDIAL)[id_AERIvDIAL]):
     AERIvDIAL_dic[d] = {}
     print(f"Reading file: {f.split(os.sep)[-1]}")
     df = netCDF4.Dataset(f, "r")
@@ -96,7 +95,6 @@ for f in np.asarray(f_AERIvDIAL)[id_AERIvDIAL]:
     for attr in df.ncattrs():
         AERIvDIAL_dic[d][attr] = df.getncattr(attr)
     df.close()
-    d += 1
 
 # ------------------------------- #
 # Plot Time-Height Cross Sections #
@@ -171,6 +169,11 @@ for d in range(len(f_AERI)):
 # Plot differences of each time-height relative to AERI Only #
 # ---------------------------------------------------------- #
 for d in range(len(f_AERI)):
+    # make sure comparing same days
+    dt_A = datetime.utcfromtimestamp(AERI_dic[d]["base_time"])
+    dt_AR = datetime.utcfromtimestamp(AERIrLID_dic[d]["base_time"])
+    dt_AD = datetime.utcfromtimestamp(AERIvDIAL_dic[d]["base_time"])
+    print(f"AERI: {dt_A}, AERI+Raman: {dt_AR}, AERI+Dial: {dt_AD}")
     # grab data
     # heights below 4 km (all files symmetric)
     z = AERI_dic[d]["height"]
