@@ -41,12 +41,12 @@ if not os.path.exists(figpath):
 # Load Water Vapor Dial Data #
 # -------------------------- #
 # AERIonly
-f_AERI = glob(os.path.join(BUL, "WaterVaporDial", "AERIonly", "*.2017052[0-3]*.cdf"))
+f_AERI = glob(os.path.join(BUL, "WaterVaporDial", "AERIonly", "*.20170[516-609]*.cdf"))
 # sort files
 date_AERI = [int(ff.split(os.sep)[-1].split(".")[-3]) for ff in f_AERI]
 id_AERI = np.argsort(date_AERI)
 AERI_dic = {}
-d = 20
+d = 0
 # loop through these files and load all vars and ncattrs into dictionary
 print("---AERI Only---")
 for f in np.asarray(f_AERI)[id_AERI]:
@@ -62,11 +62,11 @@ for f in np.asarray(f_AERI)[id_AERI]:
 
 #AERIrLID
 print("---AERI with Raman Lidar---")
-f_AERIrLID = glob(os.path.join(BUL, "WaterVaporDial", "AERIrLID", "*.2017052[0-3]*.cdf"))
+f_AERIrLID = glob(os.path.join(BUL, "WaterVaporDial", "AERIrLID", "*.20170[516-609]*.cdf"))
 date_AERIrLID = [int(ff.split(os.sep)[-1].split(".")[-3]) for ff in f_AERIrLID]
 id_AERIrLID = np.argsort(date_AERIrLID)
 AERIrLID_dic = {}
-d = 20
+d = 0
 # loop through these files and load all vars and ncattrs into dictionary
 for f in np.asarray(f_AERIrLID)[id_AERIrLID]:
     AERIrLID_dic[d] = {}
@@ -81,11 +81,11 @@ for f in np.asarray(f_AERIrLID)[id_AERIrLID]:
 
 #AERIvDIAL
 print("---AERI with Water Vapor Dial---")
-f_AERIvDIAL = glob(os.path.join(BUL, "WaterVaporDial", "AERIvDIAL", "*.2017052[0-3]*.cdf"))
+f_AERIvDIAL = glob(os.path.join(BUL, "WaterVaporDial", "AERIvDIAL", "*.20170[516-609]*.cdf"))
 date_AERIvDIAL = [int(ff.split(os.sep)[-1].split(".")[-3]) for ff in f_AERIvDIAL]
 id_AERIvDIAL = np.argsort(date_AERIvDIAL)
 AERIvDIAL_dic = {}
-d = 20
+d = 0
 # loop through these files and load all vars and ncattrs into dictionary
 for f in np.asarray(f_AERIvDIAL)[id_AERIvDIAL]:
     AERIvDIAL_dic[d] = {}
@@ -106,7 +106,7 @@ rc('text',usetex='True')
 # AERI only
 # create meshgrid
 print("---Plotting---")
-for d in range(20, 24):
+for d in range(len(f_AERI)):
     iz = np.where(AERI_dic[d]["height"] <= 4.)[0]
     X1, Y1 = np.meshgrid(AERI_dic[d]["hour"], AERI_dic[d]["height"][iz])
 
@@ -123,7 +123,7 @@ for d in range(20, 24):
     ax1[0].set_ylim([0, 4])
     ax1[0].yaxis.set_major_locator(MultipleLocator(1))
     ax1[0].yaxis.set_minor_locator(MultipleLocator(0.25))
-    ax1[0].set_title(f"2017-05-{d} AERI Only")
+    ax1[0].set_title(f"{np.array(date_AERI)[id_AERI][d]} AERI Only")
 
     # AERI + Raman
     iz = np.where(AERIrLID_dic[d]["height"] <= 4.)[0]
@@ -162,7 +162,7 @@ for d in range(20, 24):
     ax1[2].set_title("AERI + vDIAL")
 
     fig1.tight_layout()
-    fsave1 = f"201705{d}_Temperature.pdf"
+    fsave1 = f"{np.array(date_AERI)[id_AERI][d]}_Temperature.pdf"
     print(f"Saving figure: {fsave1}")
     fig1.savefig(os.path.join(figpath, fsave1), dpi=150, fmt="pdf")
     plt.close(fig1)
@@ -170,7 +170,7 @@ for d in range(20, 24):
 # ---------------------------------------------------------- #
 # Plot differences of each time-height relative to AERI Only #
 # ---------------------------------------------------------- #
-for d in range(20, 24):
+for d in range(len(f_AERI)):
     # grab data
     # heights below 4 km (all files symmetric)
     z = AERI_dic[d]["height"]
@@ -240,7 +240,7 @@ for d in range(20, 24):
     ax2[0].set_ylim([0, 4])
     ax2[0].yaxis.set_major_locator(MultipleLocator(1))
     ax2[0].yaxis.set_minor_locator(MultipleLocator(0.25))
-    ax2[0].set_title(f"2017-05-{d} AERI - Raman")
+    ax2[0].set_title(f"{np.array(date_AERI)[id_AERI][d]} AERI - Raman")
     cfax21.set_edgecolor("face")
 
     # AERI - AERIvDIAL
@@ -261,7 +261,7 @@ for d in range(20, 24):
     cfax22.set_edgecolor("face")
 
     fig2.tight_layout()
-    fsave2 = f"201705{d}_Temperature_diff.pdf"
+    fsave2 = f"{np.array(date_AERI)[id_AERI][d]}_Temperature_diff.pdf"
     print(f"Saving figure: {fsave2}")
     fig2.savefig(os.path.join(figpath, fsave2), dpi=150, fmt="pdf")
     plt.close(fig2)
@@ -278,7 +278,7 @@ for d in range(20, 24):
     ax3[0].set_ylim([0, 4])
     ax3[0].yaxis.set_major_locator(MultipleLocator(1))
     ax3[0].yaxis.set_minor_locator(MultipleLocator(0.25))
-    ax3[0].set_title(f"2017-05-{d} AERI - Raman")
+    ax3[0].set_title(f"{np.array(date_AERI)[id_AERI][d]} AERI - Raman")
     cfax31.set_edgecolor("face")
 
     # AERI - AERIvDIAL
@@ -299,7 +299,7 @@ for d in range(20, 24):
     cfax32.set_edgecolor("face")
 
     fig3.tight_layout()
-    fsave3 = f"201705{d}_waterVapor_diff.pdf"
+    fsave3 = f"{np.array(date_AERI)[id_AERI][d]}_waterVapor_diff.pdf"
     print(f"Saving figure: {fsave3}")
     fig3.savefig(os.path.join(figpath, fsave3), dpi=150, fmt="pdf")
     plt.close(fig3)
