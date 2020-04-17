@@ -277,15 +277,18 @@ fig1, ax1 = plt.subplots(nrows=1, ncols=2, sharey=True, figsize=(12, 8))
 # AERI only
 ax1[0].plot(T_med_a, z_a_agl, color=colors[0], linestyle="-", linewidth=3., 
     label="AERIonly")
-ax1[0].fill_betweenx(z_a_agl, T_q1_a, T_q3_a, alpha=0.3, color=colors[0])
+# ax1[0].fill_betweenx(z_a_agl, T_q1_a, T_q3_a, alpha=0.3, color=colors[0])
+ax1[0].plot(T_q1_a, z_a_agl, T_q3_a, z_a_agl, color=colors[0], linestyle="-.", linewidth=2)
 # AERI + Raman
 ax1[0].plot(T_med_ar, z_a_agl, color=colors[1], linestyle="-", linewidth=3., 
     label="AERI $+$ Raman")
-ax1[0].fill_betweenx(z_a_agl, T_q1_ar, T_q3_ar, alpha=0.3, color=colors[1])
+# ax1[0].fill_betweenx(z_a_agl, T_q1_ar, T_q3_ar, alpha=0.3, color=colors[1])
+ax1[0].plot(T_q1_ar, z_a_agl, T_q3_ar, z_a_agl, color=colors[1], linestyle="-.", linewidth=2)
 # AERI + wv dial
 ax1[0].plot(T_med_av, z_a_agl, color=colors[2], linestyle="-", linewidth=3., 
     label="AERI $+$ vDial")
-ax1[0].fill_betweenx(z_a_agl, T_q1_av, T_q3_av, alpha=0.3, color=colors[2])
+# ax1[0].fill_betweenx(z_a_agl, T_q1_av, T_q3_av, alpha=0.3, color=colors[2])
+ax1[0].plot(T_q1_av, z_a_agl, T_q3_av, z_a_agl, color=colors[2], linestyle="-.", linewidth=2)
 # setup
 ax1[0].axvline(0., linewidth=2., color="k", linestyle="--")
 ax1[0].grid()
@@ -302,13 +305,16 @@ ax1[0].text(0.89,0.95,r'\textbf{(a)}',fontsize=20,bbox=props, transform=ax1[0].t
 # wvmr
 # AERI only
 ax1[1].plot(w_med_a, z_a_agl, color=colors[0], linestyle="-", linewidth=3.)
-ax1[1].fill_betweenx(z_a_agl, w_q1_a, w_q3_a, alpha=0.3, color=colors[0])
+# ax1[1].fill_betweenx(z_a_agl, w_q1_a, w_q3_a, alpha=0.3, color=colors[0])
+ax1[1].plot(w_q1_a, z_a_agl, w_q3_a, z_a_agl, color=colors[0], linestyle="-.", linewidth=2)
 # AERI + Raman
 ax1[1].plot(w_med_ar, z_a_agl, color=colors[1], linestyle="-", linewidth=3.)
-ax1[1].fill_betweenx(z_a_agl, w_q1_ar, w_q3_ar, alpha=0.3, color=colors[1])
+# ax1[1].fill_betweenx(z_a_agl, w_q1_ar, w_q3_ar, alpha=0.3, color=colors[1])
+ax1[1].plot(w_q1_ar, z_a_agl, w_q3_ar, z_a_agl, color=colors[1], linestyle="-.", linewidth=2)
 # AERI + wv dial
 ax1[1].plot(w_med_av, z_a_agl, color=colors[2], linestyle="-", linewidth=3.)
-ax1[1].fill_betweenx(z_a_agl, w_q1_av, w_q3_av, alpha=0.3, color=colors[2])
+# ax1[1].fill_betweenx(z_a_agl, w_q1_av, w_q3_av, alpha=0.3, color=colors[2])
+ax1[1].plot(w_q1_av, z_a_agl, w_q3_av, z_a_agl, color=colors[2], linestyle="-.", linewidth=2)
 # setup
 ax1[1].axvline(0., linewidth=2., color="k", linestyle="--")
 ax1[1].grid()
@@ -327,6 +333,7 @@ plt.close(fig1)
 # ------------------ #
 # Plot 2d histograms #
 # ------------------ #
+inset = False
 fig2 = plt.figure(constrained_layout=True, figsize=(16, 10))
 spec2 = fig2.add_gridspec(nrows=2, ncols=3)
 # Temperature
@@ -343,10 +350,11 @@ ax21.set_xlabel("$T_{AERIonly}$ [$^\circ$C]")
 ax21.set_ylabel("$T_{sonde}$ [$^\circ$C]")
 ax21.text(0.05, 0.78, f"RMSD: {T_rmsd_a:3.2f}$^\circ$C", fontsize=20,bbox=props,transform=ax21.transAxes)
 # inset distribution
-ax21_1 = inset_axes(ax21, width="35%", height="35%", loc=4, borderpad=1)
-ax21_1.hist(np.ravel(T_diff_a), bins=np.arange(-10., 10., 0.5), density=True)
-ax21_1.tick_params(axis="both", labelsize=10)
-ax21_1.set_title("$T_{sonde}-T_{AERI}$", fontsize=12)
+if inset:
+    ax21_1 = inset_axes(ax21, width="35%", height="35%", loc=4, borderpad=1)
+    ax21_1.hist(np.ravel(T_diff_a), bins=np.arange(-10., 10., 0.5), density=True)
+    ax21_1.tick_params(axis="both", labelsize=10)
+    ax21_1.set_title("$T_{sonde}-T_{AERI}$", fontsize=12)
 
 # AERI + raman
 ax22 = fig2.add_subplot(spec2[0, 1], sharey=ax21)
@@ -361,10 +369,11 @@ ax22.text(0.05,0.9,r'\textbf{(b)}',fontsize=20,bbox=props, transform=ax22.transA
 ax22.set_xlabel("$T_{AERI+Raman}$ [$^\circ$C]")
 ax22.text(0.05, 0.78, f"RMSD: {T_rmsd_ar:3.2f}$^\circ$C", fontsize=20,bbox=props,transform=ax22.transAxes)
 # inset distribution
-ax22_1 = inset_axes(ax22, width="35%", height="35%", loc=4, borderpad=1)
-ax22_1.hist(np.ravel(T_diff_ar), bins=np.arange(-10., 10., 0.5), density=True)
-ax22_1.tick_params(axis="both", labelsize=10)
-ax22_1.set_title("$T_{sonde}-T_{AERI+Raman}$", fontsize=12)
+if inset:
+    ax22_1 = inset_axes(ax22, width="35%", height="35%", loc=4, borderpad=1)
+    ax22_1.hist(np.ravel(T_diff_ar), bins=np.arange(-10., 10., 0.5), density=True)
+    ax22_1.tick_params(axis="both", labelsize=10)
+    ax22_1.set_title("$T_{sonde}-T_{AERI+Raman}$", fontsize=12)
 
 # AERI + wv dial
 ax23 = fig2.add_subplot(spec2[0, 2], sharey=ax21)
@@ -379,10 +388,11 @@ ax23.text(0.05,0.9,r'\textbf{(c)}',fontsize=20,bbox=props, transform=ax23.transA
 ax23.set_xlabel("$T_{AERI+vDial}$ [$^\circ$C]")
 ax23.text(0.05, 0.78, f"RMSD: {T_rmsd_av:3.2f}$^\circ$C", fontsize=20,bbox=props,transform=ax23.transAxes)
 # inset distribution
-ax23_1 = inset_axes(ax23, width="35%", height="35%", loc=4, borderpad=1)
-ax23_1.hist(np.ravel(T_diff_av), bins=np.arange(-10., 10., 0.5), density=True)
-ax23_1.tick_params(axis="both", labelsize=10)
-ax23_1.set_title("$T_{sonde}-T_{AERI+vDial}$", fontsize=12)
+if inset:
+    ax23_1 = inset_axes(ax23, width="35%", height="35%", loc=4, borderpad=1)
+    ax23_1.hist(np.ravel(T_diff_av), bins=np.arange(-10., 10., 0.5), density=True)
+    ax23_1.tick_params(axis="both", labelsize=10)
+    ax23_1.set_title("$T_{sonde}-T_{AERI+vDial}$", fontsize=12)
 
 # wvmr
 # AERI only
@@ -398,10 +408,11 @@ ax24.set_xlabel("$WVMR_{AERIonly}$ [g kg$^{-1}$]")
 ax24.set_ylabel("$WVMR_{sonde}$ [g kg$^{-1}$]")
 ax24.text(0.05, 0.78, f"RMSD: {w_rmsd_a:3.2f} "+ r"g kg$^{-1}$",fontsize=20,bbox=props,transform=ax24.transAxes)
 # inset distribution
-ax24_1 = inset_axes(ax24, width="35%", height="35%", loc=4, borderpad=1)
-ax24_1.hist(np.ravel(w_diff_a), bins=np.arange(-10., 10., 0.5), density=True)
-ax24_1.tick_params(axis="both", labelsize=10)
-ax24_1.set_title("$WVMR_{sonde}-WVMR_{AERI}$", fontsize=12)
+if inset:
+    ax24_1 = inset_axes(ax24, width="35%", height="35%", loc=4, borderpad=1)
+    ax24_1.hist(np.ravel(w_diff_a), bins=np.arange(-10., 10., 0.5), density=True)
+    ax24_1.tick_params(axis="both", labelsize=10)
+    ax24_1.set_title("$WVMR_{sonde}-WVMR_{AERI}$", fontsize=12)
 
 # AERI + Raman
 ax25 = fig2.add_subplot(spec2[1, 1], sharey=ax24)
@@ -415,10 +426,11 @@ ax25.text(0.05,0.9,r'\textbf{(e)}',fontsize=20,bbox=props, transform=ax25.transA
 ax25.set_xlabel("$WVMR_{AERI+Raman}$ [g kg$^{-1}$]")
 ax25.text(0.05, 0.78, f"RMSD: {w_rmsd_ar:3.2f} "+ r"g kg$^{-1}$",fontsize=20,bbox=props,transform=ax25.transAxes)
 # inset distribution
-ax25_1 = inset_axes(ax25, width="35%", height="35%", loc=4, borderpad=1)
-ax25_1.hist(np.ravel(w_diff_ar), bins=np.arange(-10., 10., 0.5), density=True)
-ax25_1.tick_params(axis="both", labelsize=10)
-ax25_1.set_title("$WVMR_{sonde}-WVMR_{AERI+Raman}$", fontsize=12)
+if inset:
+    ax25_1 = inset_axes(ax25, width="35%", height="35%", loc=4, borderpad=1)
+    ax25_1.hist(np.ravel(w_diff_ar), bins=np.arange(-10., 10., 0.5), density=True)
+    ax25_1.tick_params(axis="both", labelsize=10)
+    ax25_1.set_title("$WVMR_{sonde}-WVMR_{AERI+Raman}$", fontsize=12)
 
 # AERI + wv dial
 ax26 = fig2.add_subplot(spec2[1, 2], sharey=ax24)
@@ -432,10 +444,11 @@ ax26.text(0.05,0.9,r'\textbf{(f)}',fontsize=20,bbox=props, transform=ax26.transA
 ax26.set_xlabel("$WVMR_{AERI+vDial}$ [g kg$^{-1}$]")
 ax26.text(0.05, 0.78, f"RMSD: {w_rmsd_av:3.2f} "+ r"g kg$^{-1}$",fontsize=20,bbox=props,transform=ax26.transAxes)
 # inset distribution
-ax26_1 = inset_axes(ax26, width="35%", height="35%", loc=4, borderpad=1)
-ax26_1.hist(np.ravel(w_diff_av), bins=np.arange(-10., 10., 0.5), density=True)
-ax26_1.tick_params(axis="both", labelsize=10)
-ax26_1.set_title("$WVMR_{sonde}-WVMR_{AERI+vDial}$", fontsize=12)
+if inset:
+    ax26_1 = inset_axes(ax26, width="35%", height="35%", loc=4, borderpad=1)
+    ax26_1.hist(np.ravel(w_diff_av), bins=np.arange(-10., 10., 0.5), density=True)
+    ax26_1.tick_params(axis="both", labelsize=10)
+    ax26_1.set_title("$WVMR_{sonde}-WVMR_{AERI+vDial}$", fontsize=12)
 
 # save
 fsave2 = "2d_hist_T_wvmr_all.pdf"
