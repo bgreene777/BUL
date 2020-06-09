@@ -183,8 +183,8 @@ AERI_save = {"height": z[iz],
              "wvmr": w_all[0],
              "cbh": cbh_all,
              "hours_cbh": t_cbh_all}
-# with open(os.path.join(pkl, "aeri.pickle"), "wb") as fn:
-#     pickle.dump(AERI_save, fn)
+with open(os.path.join(pkl, "aeri.pickle"), "wb") as fn:
+    pickle.dump(AERI_save, fn)
 
 AERIrLID_save = {"height": z[iz],
                  "hours": hrs_run,
@@ -192,8 +192,8 @@ AERIrLID_save = {"height": z[iz],
                  "wvmr": w_all[1],
                  "cbh": cbh_all,
                  "hours_cbh": t_cbh_all}
-# with open(os.path.join(pkl, "aeri_rlid.pickle"), "wb") as fn:
-#     pickle.dump(AERIrLID_save, fn)
+with open(os.path.join(pkl, "aeri_rlid.pickle"), "wb") as fn:
+    pickle.dump(AERIrLID_save, fn)
 
 AERIvDIAL_save = {"height": z[iz],
                   "hours": hrs_run,
@@ -201,5 +201,5 @@ AERIvDIAL_save = {"height": z[iz],
                   "wvmr": w_all[2],
                   "cbh": cbh_all,
                   "hours_cbh": t_cbh_all}
-# with open(os.path.join(pkl, "aeri_vdial.pickle"), "wb") as fn:
-#     pickle.dump(AERIvDIAL_save, fn)
+with open(os.path.join(pkl, "aeri_vdial.pickle"), "wb") as fn:
+    pickle.dump(AERIvDIAL_save, fn)
