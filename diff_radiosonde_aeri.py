@@ -20,6 +20,7 @@ import cmocean
 
 from glob import glob
 from datetime import datetime
+from scipy import stats
 from scipy.interpolate import interp1d
 from matplotlib import rc
 from matplotlib import dates as mpdates
@@ -194,12 +195,16 @@ T_diff_a = T_grid - T_close_a
 T_med_a = np.nanmedian(T_diff_a, axis=0)
 T_q1_a = np.nanpercentile(T_diff_a, 25., axis=0)
 T_q3_a = np.nanpercentile(T_diff_a, 75., axis=0)
+j_nan = np.isnan(T_grid.ravel())
+T_r_a, T_p_a = stats.pearsonr(T_grid.ravel()[~j_nan], T_close_a.ravel()[~j_nan])
 # wvmr
 w_rmsd_a = RMSD(w_grid, w_close_a)
 w_diff_a = w_grid - w_close_a
 w_med_a = np.nanmedian(w_diff_a, axis=0)
 w_q1_a = np.nanpercentile(w_diff_a, 25., axis=0)
 w_q3_a = np.nanpercentile(w_diff_a, 75., axis=0)
+k_nan = np.isnan(w_grid.ravel())
+w_r_a, w_p_a = stats.pearsonr(w_grid.ravel()[~k_nan], w_close_a.ravel()[~k_nan])
 # AERI + raman
 # temperature
 T_rmsd_ar = RMSD(T_grid, T_close_ar)
@@ -207,12 +212,14 @@ T_diff_ar = T_grid - T_close_ar
 T_med_ar = np.nanmedian(T_diff_ar, axis=0)
 T_q1_ar = np.nanpercentile(T_diff_ar, 25., axis=0)
 T_q3_ar = np.nanpercentile(T_diff_ar, 75., axis=0)
+T_r_ar, T_p_ar = stats.pearsonr(T_grid.ravel()[~j_nan], T_close_ar.ravel()[~j_nan])
 # wvmr
 w_rmsd_ar = RMSD(w_grid, w_close_ar)
 w_diff_ar = w_grid - w_close_ar
 w_med_ar = np.nanmedian(w_diff_ar, axis=0)
 w_q1_ar = np.nanpercentile(w_diff_ar, 25., axis=0)
 w_q3_ar = np.nanpercentile(w_diff_ar, 75., axis=0)
+w_r_ar, w_p_ar = stats.pearsonr(w_grid.ravel()[~k_nan], w_close_ar.ravel()[~k_nan])
 # AERI + wv dial
 # temperature
 T_rmsd_av = RMSD(T_grid, T_close_av)
@@ -220,12 +227,14 @@ T_diff_av = T_grid - T_close_av
 T_med_av = np.nanmedian(T_diff_av, axis=0)
 T_q1_av = np.nanpercentile(T_diff_av, 25., axis=0)
 T_q3_av = np.nanpercentile(T_diff_av, 75., axis=0)
+T_r_av, T_p_av = stats.pearsonr(T_grid.ravel()[~j_nan], T_close_av.ravel()[~j_nan])
 # wvmr
 w_rmsd_av = RMSD(w_grid, w_close_av)
 w_diff_av = w_grid - w_close_av
 w_med_av = np.nanmedian(w_diff_av, axis=0)
 w_q1_av = np.nanpercentile(w_diff_av, 25., axis=0)
 w_q3_av = np.nanpercentile(w_diff_av, 75., axis=0)
+w_r_av, w_p_av = stats.pearsonr(w_grid.ravel()[~k_nan], w_close_av.ravel()[~k_nan])
 
 # calculate 2d histogram bins and edges
 # temperature
@@ -350,6 +359,7 @@ ax21.text(0.05,0.9,r'\textbf{(a)}',fontsize=20,bbox=props, transform=ax21.transA
 ax21.set_xlabel("$T_{AERIonly}$ [$^\circ$C]")
 ax21.set_ylabel("$T_{sonde}$ [$^\circ$C]")
 ax21.text(0.05, 0.78, f"RMSD: {T_rmsd_a:3.2f}$^\circ$C", fontsize=20,bbox=props,transform=ax21.transAxes)
+ax21.text(0.05, 0.66, f"$r = {T_r_a:5.4f}$", fontsize=20,bbox=props,transform=ax21.transAxes)
 # inset distribution
 if inset:
     ax21_1 = inset_axes(ax21, width="35%", height="35%", loc=4, borderpad=1)
@@ -369,6 +379,7 @@ ax22.grid(which="both")
 ax22.text(0.05,0.9,r'\textbf{(b)}',fontsize=20,bbox=props, transform=ax22.transAxes)
 ax22.set_xlabel("$T_{AERIrLID}$ [$^\circ$C]")
 ax22.text(0.05, 0.78, f"RMSD: {T_rmsd_ar:3.2f}$^\circ$C", fontsize=20,bbox=props,transform=ax22.transAxes)
+ax22.text(0.05, 0.66, f"$r = {T_r_ar:5.4f}$", fontsize=20,bbox=props,transform=ax22.transAxes)
 # inset distribution
 if inset:
     ax22_1 = inset_axes(ax22, width="35%", height="35%", loc=4, borderpad=1)
@@ -388,6 +399,7 @@ ax23.grid(which="both")
 ax23.text(0.05,0.9,r'\textbf{(c)}',fontsize=20,bbox=props, transform=ax23.transAxes)
 ax23.set_xlabel("$T_{AERIvDIAL}$ [$^\circ$C]")
 ax23.text(0.05, 0.78, f"RMSD: {T_rmsd_av:3.2f}$^\circ$C", fontsize=20,bbox=props,transform=ax23.transAxes)
+ax23.text(0.05, 0.66, f"$r = {T_r_av:5.4f}$", fontsize=20,bbox=props,transform=ax23.transAxes)
 # inset distribution
 if inset:
     ax23_1 = inset_axes(ax23, width="35%", height="35%", loc=4, borderpad=1)
@@ -408,6 +420,7 @@ ax24.text(0.05,0.9,r'\textbf{(d)}',fontsize=20,bbox=props, transform=ax24.transA
 ax24.set_xlabel("$WVMR_{AERIonly}$ [g kg$^{-1}$]")
 ax24.set_ylabel("$WVMR_{sonde}$ [g kg$^{-1}$]")
 ax24.text(0.05, 0.78, f"RMSD: {w_rmsd_a:3.2f} "+ r"g kg$^{-1}$",fontsize=20,bbox=props,transform=ax24.transAxes)
+ax24.text(0.05, 0.66, f"$r = {w_r_a:5.4f}$",fontsize=20,bbox=props,transform=ax24.transAxes)
 # inset distribution
 if inset:
     ax24_1 = inset_axes(ax24, width="35%", height="35%", loc=4, borderpad=1)
@@ -426,6 +439,7 @@ ax25.grid(which="both")
 ax25.text(0.05,0.9,r'\textbf{(e)}',fontsize=20,bbox=props, transform=ax25.transAxes)
 ax25.set_xlabel("$WVMR_{AERIrLID}$ [g kg$^{-1}$]")
 ax25.text(0.05, 0.78, f"RMSD: {w_rmsd_ar:3.2f} "+ r"g kg$^{-1}$",fontsize=20,bbox=props,transform=ax25.transAxes)
+ax25.text(0.05, 0.66, f"$r = {w_r_ar:5.4f}$",fontsize=20,bbox=props,transform=ax25.transAxes)
 # inset distribution
 if inset:
     ax25_1 = inset_axes(ax25, width="35%", height="35%", loc=4, borderpad=1)
@@ -444,6 +458,7 @@ ax26.grid(which="both")
 ax26.text(0.05,0.9,r'\textbf{(f)}',fontsize=20,bbox=props, transform=ax26.transAxes)
 ax26.set_xlabel("$WVMR_{AERIvDIAL}$ [g kg$^{-1}$]")
 ax26.text(0.05, 0.78, f"RMSD: {w_rmsd_av:3.2f} "+ r"g kg$^{-1}$",fontsize=20,bbox=props,transform=ax26.transAxes)
+ax26.text(0.05, 0.66, f"$r = {w_r_av:5.4f}$",fontsize=20,bbox=props,transform=ax26.transAxes)
 # inset distribution
 if inset:
     ax26_1 = inset_axes(ax26, width="35%", height="35%", loc=4, borderpad=1)
