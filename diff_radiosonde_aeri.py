@@ -281,57 +281,92 @@ rc('text',usetex='True')
 z_a_agl = z_a - 237.43
 colors = [(0., 0., 0.), (0./255, 114./255., 178./255), (213./255, 94./255, 0.)]
 
-fig1, ax1 = plt.subplots(nrows=1, ncols=2, sharey=True, figsize=(12, 8))
-# temperature
+fig1, ax1 = plt.subplots(nrows=2, ncols=2, sharey=True, figsize=(12, 12))
+# temperature diff
 # AERI only
-ax1[0].plot(T_med_a, z_a_agl, color=colors[0], linestyle="-", linewidth=3., 
+ax1[0,0].plot(T_med_a, z_a_agl, color=colors[0], linestyle="-", linewidth=3., 
     label="AERIonly")
 # ax1[0].fill_betweenx(z_a_agl, T_q1_a, T_q3_a, alpha=0.3, color=colors[0])
-ax1[0].plot(T_q1_a, z_a_agl, T_q3_a, z_a_agl, color=colors[0], linestyle=":", linewidth=2)
 # AERI + Raman
-ax1[0].plot(T_med_ar, z_a_agl, color=colors[1], linestyle="-", linewidth=3., 
+ax1[0,0].plot(T_med_ar, z_a_agl, color=colors[1], linestyle="-", linewidth=3., 
     label="AERIrLID")
 # ax1[0].fill_betweenx(z_a_agl, T_q1_ar, T_q3_ar, alpha=0.3, color=colors[1])
-ax1[0].plot(T_q1_ar, z_a_agl, T_q3_ar, z_a_agl, color=colors[1], linestyle=":", linewidth=2)
 # AERI + wv dial
-ax1[0].plot(T_med_av, z_a_agl, color=colors[2], linestyle="-", linewidth=3., 
+ax1[0,0].plot(T_med_av, z_a_agl, color=colors[2], linestyle="-", linewidth=3., 
     label="AERIvDial")
 # ax1[0].fill_betweenx(z_a_agl, T_q1_av, T_q3_av, alpha=0.3, color=colors[2])
-ax1[0].plot(T_q1_av, z_a_agl, T_q3_av, z_a_agl, color=colors[2], linestyle=":", linewidth=2)
 # setup
-ax1[0].axvline(0., linewidth=2., color="k", linestyle="--")
-ax1[0].grid()
-ax1[0].legend(loc=(0.01, 0.75), fontsize=16)
-ax1[0].set_xlabel("$T_{sonde} - T_{AERIoe}$ [$^\circ$C]")
-ax1[0].set_ylabel("Altitude [m AGL]")
-ax1[0].set_xlim([-2., 2.])
-ax1[0].set_ylim([0., 4000.])
-ax1[0].xaxis.set_minor_locator(MultipleLocator(0.25))
-ax1[0].yaxis.set_minor_locator(MultipleLocator(250))
+# ax1[0,0].axvline(0., linewidth=2., color="k", linestyle="--")
+ax1[0,0].grid()
+ax1[0,0].legend(loc=(0.01, 0.65), fontsize=16)
+ax1[0,0].set_xlabel("$T_{sonde} - T_{AERIoe}$ [$^\circ$C]")
+ax1[0,0].set_ylabel("Altitude [m AGL]")
+ax1[0,0].set_title("Median $T$ Difference")
+ax1[0,0].set_xlim([0., 1.])
+ax1[0,0].set_ylim([0., 4000.])
+ax1[0,0].xaxis.set_major_locator(MultipleLocator(0.25))
+ax1[0,0].xaxis.set_minor_locator(MultipleLocator(0.05))
+ax1[0,0].yaxis.set_minor_locator(MultipleLocator(250))
 props=dict(boxstyle='square',facecolor='white',alpha=0.5)
-ax1[0].text(0.03,0.95,r'\textbf{(a)}',fontsize=20,bbox=props, transform=ax1[0].transAxes)
+ax1[0,0].text(0.03,0.93,r'\textbf{(a)}',fontsize=20,bbox=props, transform=ax1[0,0].transAxes)
 
-# wvmr
+# temperature IQR
 # AERI only
-ax1[1].plot(w_med_a, z_a_agl, color=colors[0], linestyle="-", linewidth=3.)
-# ax1[1].fill_betweenx(z_a_agl, w_q1_a, w_q3_a, alpha=0.3, color=colors[0])
-ax1[1].plot(w_q1_a, z_a_agl, w_q3_a, z_a_agl, color=colors[0], linestyle=":", linewidth=2)
+ax1[1,0].plot(T_q3_a-T_q1_a, z_a_agl, color=colors[0], linestyle="-", linewidth=3)
 # AERI + Raman
-ax1[1].plot(w_med_ar, z_a_agl, color=colors[1], linestyle="-", linewidth=3.)
-# ax1[1].fill_betweenx(z_a_agl, w_q1_ar, w_q3_ar, alpha=0.3, color=colors[1])
-ax1[1].plot(w_q1_ar, z_a_agl, w_q3_ar, z_a_agl, color=colors[1], linestyle=":", linewidth=2)
+ax1[1,0].plot(T_q3_ar-T_q1_ar, z_a_agl, color=colors[1], linestyle="-", linewidth=3)
 # AERI + wv dial
-ax1[1].plot(w_med_av, z_a_agl, color=colors[2], linestyle="-", linewidth=3.)
-# ax1[1].fill_betweenx(z_a_agl, w_q1_av, w_q3_av, alpha=0.3, color=colors[2])
-ax1[1].plot(w_q1_av, z_a_agl, w_q3_av, z_a_agl, color=colors[2], linestyle=":", linewidth=2)
+ax1[1,0].plot(T_q3_av-T_q1_av, z_a_agl, color=colors[2], linestyle="-", linewidth=3)
 # setup
-ax1[1].axvline(0., linewidth=2., color="k", linestyle="--")
-ax1[1].grid()
-ax1[1].set_xlabel("$WVMR_{sonde} - WVMR_{AERIoe}$ [g kg$^{-1}$]")
-ax1[1].set_xlim([-2., 2.])
-ax1[1].xaxis.set_minor_locator(MultipleLocator(0.25))
-ax1[1].yaxis.set_minor_locator(MultipleLocator(250))
-ax1[1].text(0.03,0.95,r'\textbf{(b)}',fontsize=20,bbox=props, transform=ax1[1].transAxes)
+ax1[1,0].grid()
+ax1[1,0].set_xlabel("$T$ IQR [$^\circ$C]")
+ax1[1,0].set_ylabel("Altitude [m AGL]")
+ax1[1,0].set_title("$T$ Difference IQR")
+ax1[1,0].set_xlim([0., 2.5])
+ax1[1,0].set_ylim([0., 4000.])
+ax1[1,0].xaxis.set_major_locator(MultipleLocator(0.5))
+ax1[1,0].xaxis.set_minor_locator(MultipleLocator(0.1))
+ax1[1,0].yaxis.set_minor_locator(MultipleLocator(250))
+ax1[1,0].text(0.03,0.93,r'\textbf{(c)}',fontsize=20,bbox=props, transform=ax1[1,0].transAxes)
+
+
+# wvmr doff
+# AERI only
+ax1[0,1].plot(w_med_a, z_a_agl, color=colors[0], linestyle="-", linewidth=3.)
+# ax1[1].fill_betweenx(z_a_agl, w_q1_a, w_q3_a, alpha=0.3, color=colors[0])
+# AERI + Raman
+ax1[0,1].plot(w_med_ar, z_a_agl, color=colors[1], linestyle="-", linewidth=3.)
+# ax1[1].fill_betweenx(z_a_agl, w_q1_ar, w_q3_ar, alpha=0.3, color=colors[1])
+# AERI + wv dial
+ax1[0,1].plot(w_med_av, z_a_agl, color=colors[2], linestyle="-", linewidth=3.)
+# ax1[1].fill_betweenx(z_a_agl, w_q1_av, w_q3_av, alpha=0.3, color=colors[2])
+# setup
+ax1[0,1].axvline(0., linewidth=2., color="k", linestyle="--")
+ax1[0,1].grid()
+ax1[0,1].set_xlabel("$WVMR_{sonde} - WVMR_{AERIoe}$ [g kg$^{-1}$]")
+ax1[0,1].set_title("Median $WVMR$ Difference")
+ax1[0,1].set_xlim([-0.25, 1.])
+ax1[0,1].xaxis.set_major_locator(MultipleLocator(0.25))
+ax1[0,1].xaxis.set_minor_locator(MultipleLocator(0.05))
+ax1[0,1].yaxis.set_minor_locator(MultipleLocator(250))
+ax1[0,1].text(0.03,0.93,r'\textbf{(b)}',fontsize=20,bbox=props, transform=ax1[0,1].transAxes)
+
+# wvmr IQR
+# AERI only
+ax1[1,1].plot(w_q3_a-w_q1_a, z_a_agl, color=colors[0], linestyle="-", linewidth=3)
+# AERI + Raman
+ax1[1,1].plot(w_q3_ar-w_q1_ar, z_a_agl, color=colors[1], linestyle="-", linewidth=3)
+# AERI + wv dial
+ax1[1,1].plot(w_q3_av-w_q1_av, z_a_agl, color=colors[2], linestyle="-", linewidth=3)
+# setup
+ax1[1,1].grid()
+ax1[1,1].set_xlabel("$WVMR$ IQR [g kg$^{-1}$]")
+ax1[1,1].set_title("$WVMR$ Difference IQR")
+ax1[1,1].set_xlim([0., 3.])
+ax1[1,1].xaxis.set_major_locator(MultipleLocator(0.5))
+ax1[1,1].xaxis.set_minor_locator(MultipleLocator(0.1))
+ax1[1,1].yaxis.set_minor_locator(MultipleLocator(250))
+ax1[1,1].text(0.03,0.93,r'\textbf{(d)}',fontsize=20,bbox=props, transform=ax1[1,1].transAxes)
 
 
 fig1.tight_layout()
