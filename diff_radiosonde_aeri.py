@@ -71,6 +71,23 @@ f_sond = glob(os.path.join(BUL, "Radiosonde", "*.cdf"))
 dt_sond = [datetime.strptime("".join(ff.split(os.sep)[-1].split(".")[-3:-1]), 
     "%Y%m%d%H%M%S") for ff in f_sond]
 i_sond = np.argsort(dt_sond)
+# sort by 0, 6, 12, 18 UTC launches
+i00, i06, i12, i18 = ([] for _ in range(4))
+for it, kt in enumerate(np.array(dt_sond)[i_sond]):
+    if kt.hour == 23:
+        i00.append(it)
+    elif kt.hour == 5:
+        i06.append(it)
+    elif kt.hour == 11:
+        i12.append(it)
+    elif kt.hour == 17:
+        i18.append(it)
+    else:
+        print(f"Does not match: {kt}")
+i00 = np.array(i00)
+i06 = np.array(i06)
+i12 = np.array(i12)
+i18 = np.array(i18)
 
 # initialize lists for T, Td, alt, time
 T_all = []
@@ -137,7 +154,7 @@ for i, f in enumerate(np.array(f_sond)[i_sond]):
 z_a = (data_a["height"].data * 1000.) + 237.43
 nz = len(z_a)
 # initialize arrays to fill with gridded interpolated data
-n_sond = len(f_sond)
+n_sond = len(T_all)
 T_grid = np.full((n_sond, nz), np.nan, dtype=float)
 w_grid = np.full((n_sond, nz), np.nan, dtype=float)
 t_grid = np.full((n_sond, nz), np.nan, dtype=float)
@@ -197,6 +214,15 @@ T_q1_a = np.nanpercentile(T_diff_a, 25., axis=0)
 T_q3_a = np.nanpercentile(T_diff_a, 75., axis=0)
 j_nan = np.isnan(T_grid.ravel())
 T_r_a, T_p_a = stats.pearsonr(T_grid.ravel()[~j_nan], T_close_a.ravel()[~j_nan])
+# calculate AERIonly temp diffs based on hour
+T_diff_a_00 = T_grid[i00, :] - T_close_a[i00, :]
+T_diff_a_06 = T_grid[i06, :] - T_close_a[i06, :]
+T_diff_a_12 = T_grid[i12, :] - T_close_a[i12, :]
+T_diff_a_18 = T_grid[i18, :] - T_close_a[i18, :]
+T_med_a_00 = np.nanmedian(T_diff_a_00, axis=0)
+T_med_a_06 = np.nanmedian(T_diff_a_06, axis=0)
+T_med_a_12 = np.nanmedian(T_diff_a_12, axis=0)
+T_med_a_18 = np.nanmedian(T_diff_a_18, axis=0)
 # wvmr
 w_rmsd_a = RMSD(w_grid, w_close_a)
 w_diff_a = w_grid - w_close_a
